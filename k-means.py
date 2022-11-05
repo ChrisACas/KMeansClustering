@@ -21,7 +21,6 @@ def converged(centroids, old_centroids):
 	if len(old_centroids) == 0:
 		return False
 
-
 	if len(centroids) <= 5:
 		a = 1
 	elif len(centroids) <= 10:
@@ -39,8 +38,6 @@ def converged(centroids, old_centroids):
 			return False
 
 	return True
-
-#end converged
 
 
 # ======
@@ -65,16 +62,25 @@ def getMin(pixel, centroids):
 
 
 
-# ============
-# assignPixels
-# ============
-def assignPixels(centroids):
-        clusters = {}
 
-        ## Write your code here
-        return clusters
+def assignPixels(centroids:list) -> dict:
+	"""Groups pixels and assigns to closes centroid
 
-#end assignPixels
+	Args:		list containing centroid coords
+
+	Returns:	dict with keys being centroid 
+		and vals being pixels closest to that centroid
+	"""
+	clusters = dict.fromkeys(centroids)
+	
+	for w in range(img_width):
+		for h in range(img_height):
+			closest_centroid = getMin(px[w, h], centroids)
+			clusters[closest_centroid] = px[w, h]
+
+
+	return clusters	
+
 
 
 
@@ -85,10 +91,9 @@ def assignPixels(centroids):
 def adjustCentroids(clusters):
 	new_centroids = []
 
-        ## Write your code here
+		## Write your code here
 	return new_centroids
 
-#end adjustCentroids
 
 
 # ===========
@@ -107,11 +112,6 @@ def initializeKmeans(someK):
 	print("===========================================")
 
 	return centroids
-#end initializeKmeans
-
-
-
-
 
 # ===========
 # iterateKmeans
@@ -129,8 +129,6 @@ def iterateKmeans(centroids):
 	print("===========================================")
 	print("Convergence Reached!")
 	return centroids
-#end iterateKmeans
-
 
 # ==========
 # drawWindow
@@ -149,9 +147,6 @@ def drawWindow(result):
 			p[x, y] = RGB_value
 
 	img.show()
-
-#end drawWindow
-
 
 
 num_input = str(input("Enter image number: "))
