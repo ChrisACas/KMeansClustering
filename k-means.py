@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from PIL import Image, ImageStat
-import numpy
+import numpy as np
 
 
 # =========
@@ -51,7 +51,7 @@ def getMin(pixel, centroids):
 	minIndex = 0
 
 	for i in range(0, len(centroids)):
-		d = numpy.sqrt(int((centroids[i][0] - pixel[0]))**2 + int((centroids[i][1] - pixel[1]))**2 + int((centroids[i][2] - pixel[2]))**2)
+		d = np.sqrt(int((centroids[i][0] - pixel[0]))**2 + int((centroids[i][1] - pixel[1]))**2 + int((centroids[i][2] - pixel[2]))**2)
 		if d < minDist:
 			minDist = d
 			minIndex = i
@@ -78,20 +78,21 @@ def assignPixels(centroids:list) -> dict:
 			closest_centroid = getMin(px[w, h], centroids)
 			clusters[closest_centroid] = px[w, h]
 
-
 	return clusters	
 
 
+def adjustCentroids(clusters: dict) -> list:
+	"""Recenter the centroid using the mean average of each clusters pixels
 
+	Args: 		dict of centroids with assigned pixels 
 
-# ===============
-# adjustCentroids
-# ===============
-
-def adjustCentroids(clusters):
+	Returns:	list of new centroid coords
+	"""
 	new_centroids = []
+	
+	for old_centroid, pixels in clusters.items(): 
+		new_centroids += tuple(np.mean(pixels, axis=0))
 
-		## Write your code here
 	return new_centroids
 
 
@@ -149,17 +150,19 @@ def drawWindow(result):
 	img.show()
 
 
-num_input = str(input("Enter image number: "))
-k_input = int(input("Enter K value: "))
+num_input = str(3)	# str(input("Enter image number: "))
+k_input = 4			# int(input("Enter K value: "))
 
 img = "img/test" + num_input.zfill(2) + ".jpg"
 im = Image.open(img)
 img_width, img_height = im.size
 px = im.load()
-initial_centroid=initializeKmeans(k_input)
-result = iterateKmeans(initial_centroid)
-drawWindow(result)
+# initial_centroid=initializeKmeans(k_input)
+# result = iterateKmeans(initial_centroid)
+# drawWindow(result)
+print(type(px[3,4]))
+test_centroid = (3, 4, 5)
+test_pixels = [(1, 2, 2), (2, 1, 1), (3, 3, 3), (4, 4, 4)]
+test_cluster = {test_centroid: test_pixels}
 
-
-
-
+new_test_centroic = adjustCentroids(test_cluster)
