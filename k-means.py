@@ -47,17 +47,22 @@ def converged(centroids, old_centroids):
 # Method used to find the closest centroid to the given pixel.
 #
 def getMin(pixel, centroids):
+	"""Find and return the centroid that has the smalled distance to each pixel
+
+	Args: 		pixel and list of centroids 
+
+	Return: 	centroid with the minimum distance to the pixel
+	"""
 	minDist = 9999
 	minIndex = 0
-
+	
 	for i in range(0, len(centroids)):
 		d = np.sqrt(int((centroids[i][0] - pixel[0]))**2 + int((centroids[i][1] - pixel[1]))**2 + int((centroids[i][2] - pixel[2]))**2)
 		if d < minDist:
 			minDist = d
 			minIndex = i
 
-	return minIndex
-#end getMin
+	return centroids[minIndex]
 
 
 def assignPixels(centroids:list) -> dict:
@@ -70,13 +75,16 @@ def assignPixels(centroids:list) -> dict:
 	"""
 	clusters = dict.fromkeys(centroids)
 
+	# initialize values in dict as list()
+	for key in clusters:
+		clusters[key] = list()
+
 	for h in range(img_height):
 		for w in range(img_width):
-			closest_centroid = getMin(px[h, w], centroids)
-			clusters[closest_centroid] = px[h, w]
+			closest_centroid = getMin(px[w, h], centroids)
+			clusters[closest_centroid] += tuple(px[w, h]),
 
 	return clusters	
-
 
 def adjustCentroids(clusters: dict) -> list:
 	"""Recenter the centroid using the mean average of each clusters pixels
@@ -86,7 +94,7 @@ def adjustCentroids(clusters: dict) -> list:
 	Returns:	list of new centroid coords
 	"""
 	new_centroids = []
-	
+
 	for old_centroid, pixels in clusters.items(): 
 		new_centroids += tuple(np.mean(pixels, axis=0))
 
@@ -104,7 +112,7 @@ def initializeKmeans(k: int) -> list:
 
 	for i in range(k): 
 		random_pixel = px[random.randint(0, img_width), random.randint(0, img_height)]
-		centroids += random_pixel
+		centroids += (random_pixel),
 
 	print("Centroids Initialized")
 	print("===========================================")
@@ -115,19 +123,21 @@ def initializeKmeans(k: int) -> list:
 def iterateKmeans(centroids: list) -> list:
 	"""Iterate the k-means clustering steps for <= 20 steps or for convergence
 
-	Args:		list of old centroids
+	Args:		initial list of centroics
 
 	Returns:  	list of centroids (final result)
 	"""
-	old_centroids = []
+	old_centroids = centroids
 	print("Starting Assignments")
 	print("===========================================")
 	
 	for i in range(20):
-		
-		if converged(old_centroids, centroids):
+		clusters = assignPixels(old_centroids)
+		centroids = adjustCentroids(clusters)
+		if converged(centroids, old_centroids):
 			break
-	
+		old_centroids = centroids
+
 	print("===========================================")
 	print("Convergence Reached!")
 	return centroids
@@ -151,22 +161,24 @@ def drawWindow(result):
 	img.show()
 
 
-num_input = str(3)	# str(input("Enter image number: "))
-k_input = 4			# int(input("Enter K value: "))
+num_input = str(input("Enter image number: "))
+k_input = int(input("Enter K value: "))
 
 img = "img/test" + num_input.zfill(2) + ".jpg"
 im = Image.open(img)
 img_width, img_height = im.size
 px = im.load()
 initial_centroid=initializeKmeans(k_input)
-print(initial_centroid)
-# result = iterateKmeans(initial_centroid)
-# drawWindow(result)
-print(type(px[3,4]))
-test_centroid = (3, 4, 5)
-test_pixels = [(1, 2, 2), (2, 1, 1), (3, 3, 3), (4, 4, 4)]
-test_cluster = {test_centroid: test_pixels}
+result = iterateKmeans(initial_centroid)
+drawWindow(result)
 
-new_test_centroic = adjustCentroids(test_cluster)
+# Some Testing
 
+# print(type(px[3,4]))
+# test_centroid = (3, 4, 5)
+# test_pixels = [(1, 2, 2), (2, 1, 1), (3, 16, 3), (4, 4, 4)]
+# test_cluster = {test_centroid: test_pixels}
+
+# # new_test_centroic = adjustCentroids(test_cluster)
+# print(tuple(np.mean(test_pixels, axis=0)))
 
