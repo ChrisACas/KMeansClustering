@@ -31,7 +31,7 @@ def converged(centroids, old_centroids):
 	for i in range(0, len(centroids)):
 		cent = centroids[i]
 		old_cent = old_centroids[i]
-
+		
 		if ((int(old_cent[0]) - a) <= cent[0] <= (int(old_cent[0]) + a)) and ((int(old_cent[1]) - a) <= cent[1] <= (int(old_cent[1]) + a)) and ((int(old_cent[2]) - a) <= cent[2] <= (int(old_cent[2]) + a)):
 			continue
 		else:
@@ -40,12 +40,6 @@ def converged(centroids, old_centroids):
 	return True
 
 
-# ======
-# getMin
-# ======
-#
-# Method used to find the closest centroid to the given pixel.
-#
 def getMin(pixel, centroids):
 	"""Find and return the centroid that has the smalled distance to each pixel
 
@@ -96,7 +90,7 @@ def adjustCentroids(clusters: dict) -> list:
 	new_centroids = []
 
 	for old_centroid, pixels in clusters.items(): 
-		new_centroids += tuple(np.mean(pixels, axis=0))
+		new_centroids += tuple(np.mean(pixels, axis=0)),
 
 	return new_centroids
 
@@ -134,6 +128,7 @@ def iterateKmeans(centroids: list) -> list:
 	for i in range(20):
 		clusters = assignPixels(old_centroids)
 		centroids = adjustCentroids(clusters)
+
 		if converged(centroids, old_centroids):
 			break
 		old_centroids = centroids
