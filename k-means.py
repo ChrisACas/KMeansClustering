@@ -155,6 +155,23 @@ def drawWindow(result):
 
 	img.show()
 
+def objectiveFunction(centroids: list) -> float: 
+	"""Optimization criterion is to minimize total sqaured error
+			between pixels and centroids
+
+		Args: list of centroids, then used to make clusters 
+
+		Returns: Summation of the squared errors between pixels and centroid
+	"""
+	clusters = assignPixels(centroids)
+	SE_centroid = []
+	for centroid, pixels in clusters.items():
+		# Kmeans objective function
+		SE_centroid += np.sum( np.sum ( np.subtract(pixels, centroid) **2, axis=0 ) ),
+	
+
+	Total_SE = np.sum(SE_centroid)
+	return Total_SE
 
 num_input = str(input("Enter image number: "))
 k_input = int(input("Enter K value: "))
@@ -165,7 +182,6 @@ img_width, img_height = im.size
 px = im.load()
 initial_centroid=initializeKmeans(k_input)
 result = iterateKmeans(initial_centroid)
-print()
 drawWindow(result)
 
 # Some Testing
