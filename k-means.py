@@ -31,7 +31,7 @@ def converged(centroids, old_centroids):
 	for i in range(0, len(centroids)):
 		cent = centroids[i]
 		old_cent = old_centroids[i]
-		
+
 		if ((int(old_cent[0]) - a) <= cent[0] <= (int(old_cent[0]) + a)) and ((int(old_cent[1]) - a) <= cent[1] <= (int(old_cent[1]) + a)) and ((int(old_cent[2]) - a) <= cent[2] <= (int(old_cent[2]) + a)):
 			continue
 		else:
@@ -150,8 +150,8 @@ def drawWindow(result):
 
 	for x in range(img.size[0]):
 		for y in range(img.size[1]):
-			RGB_value = result[getMin(px[x, y], result)]
-			p[x, y] = RGB_value
+			RGB_value = getMin(px[x, y], result)
+			p[x, y] = tuple([int(i) for i in list(np.round_(np.array(RGB_value)))])
 
 	img.show()
 
@@ -165,6 +165,7 @@ img_width, img_height = im.size
 px = im.load()
 initial_centroid=initializeKmeans(k_input)
 result = iterateKmeans(initial_centroid)
+print()
 drawWindow(result)
 
 # Some Testing
