@@ -2,7 +2,8 @@
 from PIL import Image, ImageStat
 import numpy as np
 import random
-
+import matplotlib.pyplot as plt
+from tqdm import tqdm
 # =========
 # converged
 # =========
@@ -105,11 +106,8 @@ def initializeKmeans(k: int) -> list:
 	centroids = []
 
 	for i in range(k): 
-		random_pixel = px[random.randint(0, img_width), random.randint(0, img_height)]
+		random_pixel = px[random.randint(0, img_width-1), random.randint(0, img_height-1)]
 		centroids += (random_pixel),
-
-	print("Centroids Initialized")
-	print("===========================================")
 
 	return centroids
 
@@ -122,8 +120,6 @@ def iterateKmeans(centroids: list) -> list:
 	Returns:  	list of centroids (final result)
 	"""
 	old_centroids = centroids
-	print("Starting Assignments")
-	print("===========================================")
 	
 	for i in range(20):
 		clusters = assignPixels(old_centroids)
@@ -133,8 +129,6 @@ def iterateKmeans(centroids: list) -> list:
 			break
 		old_centroids = centroids
 
-	print("===========================================")
-	print("Convergence Reached!")
 	return centroids
 
 # ==========
@@ -173,6 +167,22 @@ def objectiveFunction(centroids: list) -> float:
 	Total_SE = np.sum(SE_centroid)
 	return Total_SE
 
+def elbowPlot():
+	x = []
+	y = []
+
+	for k in tqdm(range(1, 10)):
+		x += k,
+		k_centroids=initializeKmeans(k)
+		k_result = iterateKmeans(k_centroids)
+		y += -objectiveFunction(k_result),
+	
+	plt.xlabel("k Clusters")
+	plt.ylabel("Total Squared Error")
+	plt.setTitle("Elbow Plot")
+	plt.plot(x, y)
+	plt.show()
+
 num_input = str(input("Enter image number: "))
 k_input = int(input("Enter K value: "))
 
@@ -183,6 +193,7 @@ px = im.load()
 initial_centroid=initializeKmeans(k_input)
 result = iterateKmeans(initial_centroid)
 drawWindow(result)
+elbowPlot()
 
 # Some Testing
 
