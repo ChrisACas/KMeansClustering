@@ -40,7 +40,6 @@ def converged(centroids, old_centroids):
 
 	return True
 
-
 def getMin(pixel, centroids):
 	"""Find and return the centroid that has the smalled distance to each pixel
 
@@ -58,7 +57,6 @@ def getMin(pixel, centroids):
 			minIndex = i
 
 	return centroids[minIndex]
-
 
 def assignPixels(centroids:list) -> dict:
 	"""Groups pixels and assigns to closes centroid
@@ -95,7 +93,6 @@ def adjustCentroids(clusters: dict) -> list:
 
 	return new_centroids
 
-
 def initializeKmeans(k: int) -> list:
 	"""Create a list of k number of centroids by randomly sampling pixels
 
@@ -110,7 +107,6 @@ def initializeKmeans(k: int) -> list:
 		centroids += (random_pixel),
 
 	return centroids
-
 
 def iterateKmeans(centroids: list) -> list:
 	"""Iterate the k-means clustering steps for <= 20 steps or for convergence
@@ -138,7 +134,7 @@ def iterateKmeans(centroids: list) -> list:
 # Once the k-means clustering is finished, this method
 # generates the segmented image and opens it.
 #
-def drawWindow(result):
+def drawWindow(iteration, result):
 	img = Image.new('RGB', (img_width, img_height), "white")
 	p = img.load()
 
@@ -146,7 +142,7 @@ def drawWindow(result):
 		for y in range(img.size[1]):
 			RGB_value = getMin(px[x, y], result)
 			p[x, y] = tuple([int(i) for i in list(np.round_(np.array(RGB_value)))])
-
+	img.save("./img_results/img"+str(num_input)+"_withk"+str(k_input)+"_icoutn"+str(iteration)+".png")
 	img.show()
 
 def objectiveFunction(centroids: list) -> float: 
@@ -171,37 +167,37 @@ def elbowPlot():
 	x = []
 	y = []
 
-	for k in tqdm(range(1, 10)):
+	for k in tqdm(range(1, 21)):
 		x += k,
 		k_centroids=initializeKmeans(k)
 		k_result = iterateKmeans(k_centroids)
-		y += -objectiveFunction(k_result),
+		y += objectiveFunction(k_result),
 	
 	plt.xlabel("k Clusters")
 	plt.ylabel("Total Squared Error")
-	plt.setTitle("Elbow Plot")
+	plt.title("Elbow Plot")
 	plt.plot(x, y)
+	fig = plt.gcf()
+	fig.savefig("./plots/img"+str(num_input)+"_plot.jpg", dpi=100)
 	plt.show()
+	
+
+def experiment():
+	for i in tqdm(range(1, iterations+1)):
+		k_centroids=initializeKmeans(k_input)
+		k_result = iterateKmeans(k_centroids)
+		drawWindow(i, k_result)
+	
+	
+
 
 num_input = str(input("Enter image number: "))
 k_input = int(input("Enter K value: "))
+iterations = int(input("Enter the number of epochs: "))
 
 img = "img/test" + num_input.zfill(2) + ".jpg"
 im = Image.open(img)
 img_width, img_height = im.size
 px = im.load()
-initial_centroid=initializeKmeans(k_input)
-result = iterateKmeans(initial_centroid)
-drawWindow(result)
-elbowPlot()
-
-# Some Testing
-
-# print(type(px[3,4]))
-# test_centroid = (3, 4, 5)
-# test_pixels = [(1, 2, 2), (2, 1, 1), (3, 16, 3), (4, 4, 4)]
-# test_cluster = {test_centroid: test_pixels}
-
-# # new_test_centroic = adjustCentroids(test_cluster)
-# print(tuple(np.mean(test_pixels, axis=0)))
-
+#elbowPlot()
+experiment()
